@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>מבוא לפונקציה | כלי הוראה ללוח</title>
+  <meta name="description" content="יישומון אינטראקטיבי להוראת מבוא לפונקציה: התאמה, תחום, טווח, פונקציה, מקור, תמונה ו-f(x)." />
+  <style>
+    :root{
+      --bg:#f7f7fb;
+      --panel:#ffffff;
+      --text:#172033;
+      --muted:#667085;
+      --line:#dfe4ee;
+      --brand:#7a1f3d;
+      --brand-2:#a33b61;
+      --brand-soft:#f8edf2;
+      --blue:#2356a8;
+      --blue-soft:#edf4ff;
+      --green:#18794e;
+      --green-soft:#eaf7f0;
+      --red:#b42318;
+      --red-soft:#fff0ee;
+      --amber:#9a6700;
+      --amber-soft:#fff6db;
+      --shadow:0 12px 34px rgba(30,42,70,.10);
+      --radius:24px;
+      --radius-sm:16px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Arial,"Noto Sans Hebrew",sans-serif}
+    body{overflow-x:hidden}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    .app{min-height:100vh;display:flex;flex-direction:column}
+    .topbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.95);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+    .topbar-inner{max-width:1500px;margin:auto;padding:10px 18px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px}
+    .brand{display:flex;align-items:center;gap:12px;min-width:max-content}
+    .brand-mark{width:46px;height:46px;border-radius:14px;background:var(--brand);color:white;display:grid;place-items:center;font-size:24px;font-weight:900;box-shadow:0 8px 18px rgba(122,31,61,.18)}
+    .brand h1{font-size:20px;margin:0;font-weight:900}
+    .brand small{display:block;color:var(--muted);font-weight:700;margin-top:2px}
+    .steps{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}
+    .step-btn{border:1px solid var(--line);background:white;color:#4a5568;padding:9px 13px;border-radius:999px;font-weight:800;font-size:14px;transition:.18s}
+    .step-btn:hover{transform:translateY(-1px);border-color:#b8c1d1}
+    .step-btn.active{background:var(--brand);border-color:var(--brand);color:white;box-shadow:0 6px 15px rgba(122,31,61,.18)}
+    .top-actions{display:flex;gap:8px}
+    .icon-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:white;font-size:20px;display:grid;place-items:center}
+    main{max-width:1500px;width:100%;margin:0 auto;padding:18px;flex:1}
+    .lesson{display:none;min-height:calc(100vh - 95px)}
+    .lesson.active{display:flex;flex-direction:column;gap:16px}
+    .hero{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 22px;background:white;border:1px solid var(--line);border-radius:20px;box-shadow:0 4px 14px rgba(20,30,50,.04)}
+    .hero h2{font-size:clamp(25px,2.4vw,38px);margin:0 0 4px;font-weight:950;letter-spacing:-.02em}
+    .hero p{margin:0;color:var(--muted);font-size:clamp(15px,1.35vw,20px);font-weight:700;line-height:1.45}
+    .stage-chip{display:inline-flex;align-items:center;gap:8px;background:var(--brand-soft);color:var(--brand);border:1px solid #ead2dc;padding:7px 12px;border-radius:999px;font-weight:900;font-size:13px;margin-bottom:8px}
+    .board{background:white;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;position:relative;overflow:hidden}
+    .board.big{min-height:620px}
+    .question{font-size:clamp(28px,3vw,50px);font-weight:950;text-align:center;margin:8px 0 18px;letter-spacing:-.025em}
+    .subquestion{text-align:center;color:var(--muted);font-size:clamp(18px,1.8vw,25px);font-weight:800;margin-top:-8px;margin-bottom:16px}
+    .actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .btn{border:none;border-radius:16px;padding:14px 20px;font-weight:900;font-size:18px;min-height:54px;transition:.18s;box-shadow:0 4px 12px rgba(30,40,60,.08)}
+    .btn:hover{transform:translateY(-2px)}
+    .btn.primary{background:var(--brand);color:white}
+    .btn.secondary{background:#eef1f6;color:#27364f}
+    .btn.green{background:var(--green);color:white}
+    .btn.red{background:var(--red);color:white}
+    .btn.amber{background:#e7a615;color:#1d2433}
+    .btn.outline{background:white;border:2px solid var(--line);box-shadow:none}
+    .btn.small{font-size:15px;min-height:44px;padding:10px 14px;border-radius:13px}
+    .reveal{max-height:0;overflow:hidden;opacity:0;transition:.25s ease}
+    .reveal.open{max-height:500px;opacity:1;margin-top:16px}
+    .takeaway{background:var(--blue-soft);border:2px solid #c9daf8;border-radius:18px;padding:18px 20px;font-size:clamp(18px,1.7vw,25px);font-weight:900;text-align:center;color:#17376f}
+    .vending-wrap{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(320px,.75fr);gap:24px;align-items:stretch}
+    .machine{background:linear-gradient(180deg,#2a3552,#172033);border-radius:34px;padding:22px;max-width:780px;margin:auto;box-shadow:0 24px 60px rgba(22,32,51,.24);border:7px solid #202b46}
+    .machine-window{background:#f4f6fb;border-radius:24px;padding:20px;border:5px solid #909bb0}
+    .products{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+    .product{background:white;border:2px solid #dfe4ee;border-radius:18px;padding:12px;text-align:center;box-shadow:0 5px 14px rgba(40,50,70,.06)}
+    .product .emoji{font-size:46px;display:block}
+    .product strong{font-size:17px}
+    .keypad{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .key{border:none;background:#edf0f6;color:#172033;border-radius:16px;padding:16px 8px;font-size:24px;font-weight:950;box-shadow:inset 0 -4px 0 #cdd4e0,0 4px 12px rgba(0,0,0,.06)}
+    .key:active{transform:translateY(2px);box-shadow:inset 0 -1px 0 #cdd4e0}
+    .tray{margin-top:18px;background:#0d1423;border-radius:18px;min-height:100px;display:flex;align-items:center;justify-content:center;color:white;font-size:20px;font-weight:900;padding:12px;overflow:hidden}
+    .drop{display:flex;gap:18px;align-items:center;justify-content:center;animation:drop .38s ease-out}
+    @keyframes drop{from{transform:translateY(-30px) scale(.8);opacity:0}to{transform:none;opacity:1}}
+    .drop .emoji{font-size:54px}
+    .sidepanel{background:#f9fafc;border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:14px}
+    .sidepanel h3{margin:0;font-size:22px}
+    .mode-btn{width:100%;text-align:right;border:2px solid var(--line);background:white;border-radius:16px;padding:14px;font-weight:850;font-size:16px;color:#26344c}
+    .mode-btn.active{border-color:var(--brand);background:var(--brand-soft);color:var(--brand)}
+    .mode-btn small{display:block;color:var(--muted);font-size:13px;margin-top:4px;line-height:1.35}
+    .diagram-board{display:grid;grid-template-columns:minmax(240px,1fr) minmax(220px,.8fr) minmax(240px,1fr);align-items:center;gap:24px;min-height:470px;position:relative}
+    .set-card{border:4px solid #a8b2c3;border-radius:46% / 18%;min-height:410px;padding:22px 24px;display:flex;flex-direction:column;background:#fbfcfe;position:relative;z-index:2}
+    .set-card.domain{border-color:#5076b9;background:#f5f8ff}
+    .set-card.codomain{border-color:#af6484;background:#fff7fb}
+    .set-card h3{font-size:26px;text-align:center;margin:0 0 16px}
+    .nodes{display:flex;flex-direction:column;justify-content:space-around;gap:12px;flex:1}
+    .node{min-width:82px;min-height:54px;border-radius:16px;background:white;border:2px solid #cfd6e3;display:grid;place-items:center;font-size:24px;font-weight:950;margin:auto;padding:8px 18px;position:relative;z-index:6;transition:.15s}
+    .node.selectable:hover{border-color:var(--brand);transform:scale(1.04)}
+    .node.selected{outline:5px solid rgba(122,31,61,.16);border-color:var(--brand);background:var(--brand-soft)}
+    .node.problem{border-color:var(--red)!important;background:var(--red-soft)!important;color:var(--red)}
+    .node.good{border-color:var(--green)!important;background:var(--green-soft)!important;color:var(--green)}
+    .diagram-middle{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:8;position:relative}
+    .flow-arrow{font-size:70px;color:#aab3c2;font-weight:900;direction:ltr;unicode-bidi:isolate}
+    #arrowLayer,#quizArrowLayer,#sourceArrowLayer{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;overflow:visible}
+    .status-card{margin-top:16px;border-radius:18px;padding:16px 20px;text-align:center;font-size:22px;font-weight:900;border:2px solid var(--line);background:#fafafa}
+    .status-card.good{background:var(--green-soft);border-color:#a7dfc3;color:var(--green)}
+    .status-card.bad{background:var(--red-soft);border-color:#f5b8b2;color:var(--red)}
+    .scenario-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.65fr);gap:24px}
+    .answers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .answer-btn{border:2px solid var(--line);background:white;padding:18px 12px;border-radius:18px;font-size:20px;font-weight:950}
+    .answer-btn:hover{border-color:var(--brand)}
+    .answer-btn.correct{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+    .answer-btn.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+    .reason{font-size:22px;font-weight:850;line-height:1.5;background:#f6f8fb;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:14px;text-align:center;min-height:90px;display:flex;align-items:center;justify-content:center;position:relative;z-index:6}
+    .realworld{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);gap:24px}
+    .world-card{min-height:390px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:linear-gradient(180deg,#fff,#faf7f9);border:1px solid #eadce2;border-radius:24px;padding:26px}
+    .world-icon{font-size:84px;margin-bottom:14px}
+    .world-text{font-size:clamp(26px,2.5vw,42px);font-weight:950;line-height:1.35}
+    .world-answer{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-top:22px}
+    .source-stage{position:relative;min-height:500px;display:flex;flex-direction:column}
+    .source-demo{display:grid;grid-template-columns:minmax(230px,1fr) minmax(220px,.45fr) minmax(230px,1fr);gap:24px;align-items:center;position:relative;min-height:430px}
+    .source-toolbar{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+    .machine-fx{display:grid;grid-template-columns:minmax(220px,.8fr) minmax(280px,1.1fr) minmax(220px,.8fr);align-items:center;gap:24px;min-height:430px}
+    .io-box{border:2px solid var(--line);background:#fafbfd;border-radius:22px;padding:22px;text-align:center}
+    .io-box label{display:block;font-weight:900;font-size:18px;color:var(--muted);margin-bottom:10px}
+    .big-number{font-size:70px;font-weight:950;direction:ltr;min-height:84px;display:grid;place-items:center}
+    .fx-machine-box{background:linear-gradient(180deg,#7a1f3d,#5c142e);border-radius:32px;padding:28px;color:white;text-align:center;box-shadow:0 22px 50px rgba(122,31,61,.22)}
+    .fx-machine-box .formula{font-size:clamp(30px,3.6vw,58px);font-weight:950;direction:ltr;margin:10px 0 20px}
+    .calc-steps{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;direction:ltr}
+    .calc-step{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);border-radius:14px;padding:10px 14px;font-size:21px;font-weight:900}
+    .num-input{width:150px;text-align:center;font-size:36px;font-weight:950;border:2px solid #cfd6e3;border-radius:16px;padding:10px;direction:ltr}
+    .rule-select{font-size:18px;border:2px solid #d5dbe6;border-radius:14px;padding:11px 14px;background:white;font-weight:850;direction:ltr}
+    .teacher-tip{position:fixed;left:18px;bottom:18px;z-index:50;width:min(420px,calc(100vw - 36px));background:#fff9e9;border:2px solid #f0cf72;border-radius:18px;padding:16px 18px;box-shadow:0 14px 38px rgba(35,40,55,.16);display:none}
+    .teacher-tip.open{display:block}
+    .teacher-tip strong{display:block;color:#7b5b00;font-size:16px;margin-bottom:5px}
+    .teacher-tip p{margin:0;font-size:16px;font-weight:800;line-height:1.45}
+    .math-inline{direction:ltr;unicode-bidi:isolate;display:inline-block;font-weight:900;margin-inline:.12em}
+    .nodes .node,.status-card,.takeaway,#sourceExplain,#quizReason,#worldReason{font-variant-numeric:lining-nums tabular-nums}
+    .node{direction:ltr;unicode-bidi:isolate}
+    .set-card h3,.hero,.question,.subquestion,.world-text,.sidepanel,.status-card,.takeaway,.reason{direction:rtl}
+    #sourceExplain{min-width:min(520px,95%);margin:18px auto 0;background:#ffffff;border:2px solid #dbe5f0;box-shadow:0 12px 26px rgba(30,42,70,.10)}
+    .footer-nav{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-top:auto;padding-top:4px}
+    .progress{font-weight:900;color:var(--muted)}
+    .hidden{display:none!important}
+    .shake{animation:shake .28s linear}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+    @media(max-width:1050px){
+      .topbar-inner{grid-template-columns:1fr auto}.steps{grid-column:1/-1;order:3}.brand small{display:none}
+      .vending-wrap,.scenario-grid,.realworld{grid-template-columns:1fr}
+      .diagram-board,.source-demo,.machine-fx{grid-template-columns:1fr;min-height:auto}
+      .set-card{min-height:280px;border-radius:36px}
+      .diagram-middle{min-height:70px}.flow-arrow{transform:rotate(90deg)}
+      .machine-fx .io-box{max-width:500px;width:100%;margin:auto}
+    }
+    @media(max-width:700px){
+      .topbar-inner{padding:8px 10px}.brand h1{font-size:17px}.brand-mark{width:40px;height:40px}.steps{justify-content:flex-start;overflow:auto;flex-wrap:nowrap;padding-bottom:4px}.step-btn{white-space:nowrap}
+      main{padding:12px}.hero{padding:15px}.hero p{display:none}.board{padding:14px}.products{grid-template-columns:repeat(2,1fr)}.keypad{grid-template-columns:repeat(2,1fr)}
+      .answers{grid-template-columns:1fr}.world-answer{grid-template-columns:1fr}.question{font-size:30px}.top-actions .icon-btn:first-child{display:none}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-mark">ƒ</div>
+        <div><h1>מבוא לפונקציה</h1><small>כלי הוראה אינטראקטיבי ללוח</small></div>
+      </div>
+      <nav class="steps" id="stepsNav"></nav>
+      <div class="top-actions">
+        <button class="icon-btn" id="tipBtn" title="שאלת הוראה">💬</button>
+        <button class="icon-btn" id="fullscreenBtn" title="מסך מלא">⛶</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- STEP 1 -->
+    <section class="lesson active" id="lesson-1">
+      <div class="hero">
+        <div><div class="stage-chip">שלב 1 · מתחילים מהחיים</div><h2>מה נכנס — ומה יוצא?</h2><p>עוד בלי הגדרות. קודם מגלים מה אנחנו מצפים ממכונה תקינה.</p></div>
+      </div>
+      <div class="board big">
+        <div class="question">לחצו על כפתור במכונה. מה אתם מצפים שיקרה?</div>
+        <div class="vending-wrap">
+          <div class="machine-area">
+            <div class="machine">
+              <div class="machine-window">
+                <div class="products">
+                  <div class="product"><span class="emoji">🥜</span><strong>במבה</strong></div>
+                  <div class="product"><span class="emoji">🥤</span><strong>קולה</strong></div>
+                  <div class="product"><span class="emoji">🍫</span><strong>שוקולד</strong></div>
+                  <div class="product"><span class="emoji">🍬</span><strong>מסטיק</strong></div>
+                </div>
+                <div class="keypad">
+                  <button class="key" data-key="A1">A1</button><button class="key" data-key="A2">A2</button><button class="key" data-key="B1">B1</button><button class="key" data-key="B2">B2</button>
+                </div>
+                <div class="tray" id="tray">לחצו על כפתור</div>
+              </div>
+            </div>
+          </div>
+          <aside class="sidepanel">
+            <h3>מה יקרה אם...</h3>
+            <button class="mode-btn active" data-mode="normal"><strong>המכונה תקינה</strong><small>אותו כפתור תמיד נותן תוצאה אחת.</small></button>
+            <button class="mode-btn" data-mode="split"><strong>המכונה השתגעה</strong><small>A1 מוציא שתי תוצאות ביחד.</small></button>
+            <button class="mode-btn" data-mode="empty"><strong>כפתור לא עובד</strong><small>B2 לא מוציא שום דבר.</small></button>
+            <div class="actions"><button class="btn primary small" id="revealRuleBtn">מה למדנו?</button></div>
+            <div class="reveal" id="ruleReveal"><div class="takeaway">כדי שנוכל לסמוך על המכונה, לכל קלט צריך להיות פלט אחד ויחיד.</div></div>
+          </aside>
+        </div>
+      </div>
+      <div class="footer-nav"><span></span><span class="progress">שלב 1</span><button class="btn primary" onclick="goToLesson(2)">הופכים את זה למתמטיקה ←</button></div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="lesson" id="lesson-2">
+      <div class="hero">
+        <div><div class="stage-chip">שלב 2 · מהחיים לייצוג מתמטי</div><h2>אותה מכונה — עכשיו כדיאגרמת חיצים</h2><p>הכפתורים עוברים לקבוצה אחת, המוצרים לקבוצה שנייה.</p></div>
+      </div>
+      <div class="board big">
+        <div class="question">בנו בעצמכם את ההתאמה</div>
+        <div class="subquestion">לחצו על איבר בתחום ואז על איבר בטווח כדי ליצור חץ.</div>
+        <div class="diagram-board" id="labDiagram">
+          <svg id="arrowLayer"></svg>
+          <div class="set-card domain"><h3>התחום</h3><div class="nodes" id="domainNodes"></div></div>
+          <div class="diagram-middle"><div class="flow-arrow">←</div><strong>התאמה</strong></div>
+          <div class="set-card codomain"><h3>הטווח</h3><div class="nodes" id="codomainNodes"></div></div>
+        </div>
+        <div class="actions">
+          <button class="btn green" id="checkDiagramBtn">בדקו אותי</button>
+          <button class="btn secondary" id="clearDiagramBtn">נקה חיצים</button>
+          <button class="btn outline" id="loadValidBtn">טען דוגמת פונקציה</button>
+          <button class="btn outline" id="loadSplitBtn">טען דוגמת פיצול</button>
+          <button class="btn outline" id="loadMissingBtn">טען דוגמה חסרה</button>
+          <button class="btn outline" id="loadManyToOneBtn">הדגימו: כמה מקורות לאותה תמונה</button>
+        </div>
+        <div class="status-card" id="diagramStatus">עוד לא בדקנו.</div>
+      </div>
+      <div class="footer-nav"><button class="btn secondary" onclick="goToLesson(1)">→ חזרה</button><span class="progress">שלב 2</span><button class="btn primary" onclick="goToLesson(3)">מתרגלים זיהוי ←</button></div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="lesson" id="lesson-3">
+      <div class="hero">
+        <div><div class="stage-chip">שלב 3 · פונקציה, התאמה או לא התאמה?</div><h2>מה אתם אומרים?</h2><p>מצביעים בכיתה ורק אחר כך חושפים את ההסבר.</p></div>
+      </div>
+      <div class="board big">
+        <div class="scenario-grid">
+          <div>
+            <div class="question" id="quizTitle">האם הדיאגרמה מתארת פונקציה?</div>
+            <div class="diagram-board" id="quizDiagram" style="min-height:420px">
+              <svg id="quizArrowLayer"></svg>
+              <div class="set-card domain"><h3>תחום</h3><div class="nodes" id="quizDomain"></div></div>
+              <div class="diagram-middle"><div class="flow-arrow">←</div></div>
+              <div class="set-card codomain"><h3>טווח</h3><div class="nodes" id="quizCodomain"></div></div>
+            </div>
+          </div>
+          <aside class="sidepanel">
+            <h3>בחרו יחד בכיתה</h3>
+            <div class="answers">
+              <button class="answer-btn" data-answer="function">פונקציה</button>
+              <button class="answer-btn" data-answer="relation">התאמה שאינה פונקציה</button>
+              <button class="answer-btn" data-answer="none">לא התאמה</button>
+            </div>
+            <div class="reason" id="quizReason">בחרו תשובה ואז נסביר למה.</div>
+            <div class="actions"><button class="btn primary" id="nextQuizBtn">דוגמה הבאה</button></div>
+          </aside>
+        </div>
+      </div>
+      <div class="footer-nav"><button class="btn secondary" onclick="goToLesson(2)">→ חזרה</button><span class="progress">שלב 3</span><button class="btn primary" onclick="goToLesson(4)">מהחיים למתמטיקה ←</button></div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="lesson" id="lesson-4">
+      <div class="hero">
+        <div><div class="stage-chip">שלב 4 · קשר לעולם האמיתי</div><h2>האם הקשר הזה הוא פונקציה?</h2><p>אותו רעיון מתמטי — בסיטואציות מוכרות.</p></div>
+      </div>
+      <div class="board big">
+        <div class="realworld">
+          <div class="world-card">
+            <div class="world-icon" id="worldIcon">👦</div>
+            <div class="world-text" id="worldText"></div>
+            <div class="world-answer">
+              <button class="btn green" data-world="yes">פונקציה</button>
+              <button class="btn red" data-world="no">לא פונקציה</button>
+            </div>
+          </div>
+          <aside class="sidepanel">
+            <h3>למה?</h3>
+            <div class="reason" id="worldReason">קודם החליטו יחד.</div>
+            <div class="actions"><button class="btn primary" id="nextWorldBtn">דוגמה הבאה</button></div>
+          </aside>
+        </div>
+      </div>
+      <div class="footer-nav"><button class="btn secondary" onclick="goToLesson(3)">→ חזרה</button><span class="progress">שלב 4</span><button class="btn primary" onclick="goToLesson(5)">מקור ותמונה ←</button></div>
+    </section>
+
+    <!-- STEP 5 -->
+    <section class="lesson" id="lesson-5">
+      <div class="hero">
+        <div><div class="stage-chip">שלב 5 · מקור ותמונה</div><h2>קוראים את החצים בשפה מתמטית</h2><p>לוחצים על איבר ורואים מי המקור, מי התמונה ומהי קבוצת התמונות.</p></div>
+      </div>
+      <div class="board big source-stage">
+        <div class="source-toolbar">
+          <button class="btn outline small" id="showImagesSetBtn">הראו את קבוצת התמונות</button>
+          <button class="btn secondary small" id="resetSourceBtn">איפוס הדגשה</button>
+        </div>
+        <div class="source-demo" id="sourceDiagram">
+          <svg id="sourceArrowLayer"></svg>
+          <div class="set-card domain"><h3>התחום</h3><div class="nodes" id="sourceDomain"></div></div>
+          <div class="diagram-middle"><div class="flow-arrow">←</div></div>
+          <div class="set-card codomain"><h3>הטווח</h3><div class="nodes" id="sourceCodomain"></div></div>
+        </div>
+        <div class="reason" id="sourceExplain" style="min-height:120px">לחצו על איבר בתחום או בטווח.</div>
+      </div>
+      <div class="footer-nav"><button class="btn secondary" onclick="goToLesson(4)">→ חזרה</button><span class="progress">שלב 5</span><button class="btn primary" onclick="goToLesson(6)">עוברים ל־f(x) ←</button></div>
+    </section>
+
+    <!-- STEP 6 -->
+    <section class="lesson" id="lesson-6">
+      <div class="hero">
+        <div><div class="stage-chip">שלב 6 · הסימון f(x)</div><h2>נותנים למכונה שם</h2><p>מחברים את רעיון הקלט–פלט לסימון המתמטי.</p></div>
+        <select class="rule-select" id="fxRule">
+          <option value="plus3">f(x) = x + 3</option>
+          <option value="times2">f(x) = 2x</option>
+          <option value="square">f(x) = x²</option>
+          <option value="neg">f(x) = −x</option>
+        </select>
+      </div>
+      <div class="board big">
+        <div class="question">מכניסים מספר — והמכונה מפעילה עליו חוק</div>
+        <div class="machine-fx">
+          <div class="io-box"><label>הקלט x</label><input id="fxInput" class="num-input" type="number" value="5" step="1"></div>
+          <div class="fx-machine-box">
+            <div style="font-size:20px;font-weight:900">המכונה f</div>
+            <div class="formula" id="fxFormula">f(x)=x+3</div>
+            <div class="calc-steps" id="fxSteps"></div>
+          </div>
+          <div class="io-box"><label>התמונה f(x)</label><div class="big-number" id="fxOutput">8</div></div>
+        </div>
+        <div class="takeaway" id="fxSentence">לכן: f(5) = 8</div>
+      </div>
+      <div class="footer-nav"><button class="btn secondary" onclick="goToLesson(5)">→ חזרה</button><span class="progress">שלב 6</span><button class="btn primary" onclick="goToLesson(1)">התחלה מחדש</button></div>
+    </section>
+  </main>
+</div>
+
+<div class="teacher-tip" id="teacherTip">
+  <strong>שאלה לכיתה</strong>
+  <p id="teacherTipText"></p>
+</div>
+
+<script>
+  const lessons = [
+    {name:'מכונה'},
+    {name:'דיאגרמת חיצים'},
+    {name:'פונקציה או לא?'},
+    {name:'מהחיים'},
+    {name:'מקור ותמונה'},
+    {name:'f(x)'}
+  ];
+  const teacherTips = [
+    'אם אלחץ שוב על אותו כפתור, מה אתם מצפים שיקרה? ומה יגרום לכם להגיד שהמכונה מקולקלת?',
+    'האם מותר לשני מקורות שונים להגיע לאותה תמונה? ומה אסור שיקרה למקור אחד?',
+    'אל תענו מהר. בדקו כל איבר בתחום: האם יש לו בדיוק חץ אחד?',
+    'מה קורה אם הופכים את כיוון הקשר? האם התשובה בהכרח נשארת אותה תשובה?',
+    'אם שני מקורות מגיעים לאותה תמונה — כמה מקורות יש לתמונה הזאת?',
+    'מה ההבדל בין x לבין f(x)? מי הקלט ומי התוצאה?'
+  ];
+  let currentLesson = 1;
+
+  function buildNav(){
+    const nav = document.getElementById('stepsNav');
+    nav.innerHTML = lessons.map((l,i)=>`<button class="step-btn ${i===0?'active':''}" data-step="${i+1}">${i+1}. ${l.name}</button>`).join('');
+    nav.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>goToLesson(+b.dataset.step)));
+  }
+  function goToLesson(n){
+    currentLesson=n;
+    document.querySelectorAll('.lesson').forEach(s=>s.classList.remove('active'));
+    document.getElementById(`lesson-${n}`).classList.add('active');
+    document.querySelectorAll('.step-btn').forEach((b,i)=>b.classList.toggle('active',i===n-1));
+    document.getElementById('teacherTipText').textContent=teacherTips[n-1];
+    document.getElementById('teacherTip').classList.remove('open');
+    window.scrollTo({top:0,behavior:'smooth'});
+    setTimeout(()=>{ if(n===2) drawLabArrows(); if(n===3) renderQuiz(); if(n===5) drawSourceArrows(); },80);
+  }
+  window.goToLesson = goToLesson;
+
+  document.getElementById('tipBtn').addEventListener('click',()=>{
+    document.getElementById('teacherTipText').textContent=teacherTips[currentLesson-1];
+    document.getElementById('teacherTip').classList.toggle('open');
+  });
+  document.getElementById('fullscreenBtn').addEventListener('click',()=>{
+    if(!document.fullscreenElement) document.documentElement.requestFullscreen?.(); else document.exitFullscreen?.();
+  });
+
+  // Step 1: vending machine
+  const products = {
+    bam:{emoji:'🥜',name:'במבה'}, cola:{emoji:'🥤',name:'קולה'}, choc:{emoji:'🍫',name:'שוקולד'}, gum:{emoji:'🍬',name:'מסטיק'}
+  };
+  const normalMap={A1:['bam'],A2:['bam'],B1:['cola'],B2:['choc']};
+  let vendingMode='normal';
+  function vendingMapFor(key){
+    if(vendingMode==='split' && key==='A1') return ['bam','cola'];
+    if(vendingMode==='empty' && key==='B2') return [];
+    return normalMap[key];
+  }
+  document.querySelectorAll('.key').forEach(btn=>btn.addEventListener('click',()=>{
+    const tray=document.getElementById('tray'); const out=vendingMapFor(btn.dataset.key);
+    if(!out.length){ tray.innerHTML='<div class="drop">❌ לא יצא שום דבר</div>'; return; }
+    tray.innerHTML=`<div class="drop">${out.map(k=>`<span><span class="emoji">${products[k].emoji}</span> ${products[k].name}</span>`).join('<span style="font-size:34px">+</span>')}</div>`;
+  }));
+  document.querySelectorAll('.mode-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    vendingMode=btn.dataset.mode; document.querySelectorAll('.mode-btn').forEach(x=>x.classList.remove('active')); btn.classList.add('active'); document.getElementById('tray').textContent='לחצו על כפתור';
+  }));
+  document.getElementById('revealRuleBtn').addEventListener('click',()=>document.getElementById('ruleReveal').classList.toggle('open'));
+
+  // Generic SVG helpers
+  function nodeCenter(node,container){
+    const a=node.getBoundingClientRect(), b=container.getBoundingClientRect();
+    return {x:a.left-b.left+a.width/2,y:a.top-b.top+a.height/2};
+  }
+  function svgArrow(svg,x1,y1,x2,y2,color='#7a1f3d',width=4){
+    const id='m'+Math.random().toString(36).slice(2);
+    svg.insertAdjacentHTML('beforeend',`<defs><marker id="${id}" markerWidth="11" markerHeight="11" refX="9" refY="4" orient="auto"><path d="M0,0 L0,8 L10,4 z" fill="${color}"/></marker></defs><path d="M ${x1} ${y1} C ${(x1+x2)/2} ${y1}, ${(x1+x2)/2} ${y2}, ${x2} ${y2}" fill="none" stroke="${color}" stroke-width="${width}" stroke-linecap="round" marker-end="url(#${id})"/>`);
+  }
+  const mi = v => `<span class="math-inline">${v}</span>`;
+
+  // Step 2: lab
+  const labDomain=['A1','A2','B1','B2'];
+  const labCodomain=['🥜','🥤','🍫','🍬'];
+  let labEdges=[]; let selectedDomain=null;
+  function renderLabNodes(){
+    document.getElementById('domainNodes').innerHTML=labDomain.map((x,i)=>`<button class="node selectable" data-d="${i}">${x}</button>`).join('');
+    document.getElementById('codomainNodes').innerHTML=labCodomain.map((x,i)=>`<button class="node selectable" data-c="${i}">${x}</button>`).join('');
+    document.querySelectorAll('#domainNodes .node').forEach(n=>n.addEventListener('click',()=>{
+      selectedDomain=+n.dataset.d; document.querySelectorAll('#domainNodes .node').forEach(x=>x.classList.remove('selected')); n.classList.add('selected');
+    }));
+    document.querySelectorAll('#codomainNodes .node').forEach(n=>n.addEventListener('click',()=>{
+      if(selectedDomain===null) return;
+      const edge=[selectedDomain,+n.dataset.c];
+      if(!labEdges.some(e=>e[0]===edge[0]&&e[1]===edge[1])) labEdges.push(edge);
+      selectedDomain=null; document.querySelectorAll('#domainNodes .node').forEach(x=>x.classList.remove('selected')); drawLabArrows(); resetLabMarks();
+    }));
+  }
+  function drawLabArrows(){
+    const container=document.getElementById('labDiagram'); if(!container.offsetParent) return;
+    const svg=document.getElementById('arrowLayer'); svg.innerHTML='';
+    labEdges.forEach(([d,c])=>{
+      const dn=document.querySelector(`#domainNodes [data-d="${d}"]`), cn=document.querySelector(`#codomainNodes [data-c="${c}"]`);
+      if(!dn||!cn)return; const p1=nodeCenter(dn,container),p2=nodeCenter(cn,container); svgArrow(svg,p1.x+36,p1.y,p2.x-36,p2.y);
+    });
+  }
+  function resetLabMarks(){
+    document.querySelectorAll('#labDiagram .node').forEach(n=>n.classList.remove('problem','good'));
+    const s=document.getElementById('diagramStatus'); s.className='status-card'; s.textContent='עוד לא בדקנו.';
+  }
+  document.getElementById('checkDiagramBtn').addEventListener('click',()=>{
+    resetLabMarks(); const counts=labDomain.map((_,i)=>labEdges.filter(e=>e[0]===i).length); let ok=true; const problems=[];
+    counts.forEach((c,i)=>{ const n=document.querySelector(`#domainNodes [data-d="${i}"]`); if(c===1)n.classList.add('good'); else {n.classList.add('problem');ok=false;problems.push(c===0?`${mi(labDomain[i])} ללא חץ`:`מ־${mi(labDomain[i])} יוצאים ${mi(c)} חצים`)} });
+    const s=document.getElementById('diagramStatus'); s.className='status-card '+(ok?'good':'bad'); s.innerHTML=ok?'✓ זו פונקציה: מכל איבר בתחום יוצא חץ אחד ויחיד.':'✗ עדיין לא פונקציה: '+problems.join(' · ');
+  });
+  document.getElementById('clearDiagramBtn').addEventListener('click',()=>{labEdges=[];drawLabArrows();resetLabMarks()});
+  document.getElementById('loadManyToOneBtn').addEventListener('click',()=>{labEdges=[[0,0],[1,0],[2,0],[3,0]];drawLabArrows();resetLabMarks()});
+  document.getElementById('loadValidBtn').addEventListener('click',()=>{labEdges=[[0,0],[1,0],[2,1],[3,2]];drawLabArrows();resetLabMarks()});
+  document.getElementById('loadSplitBtn').addEventListener('click',()=>{labEdges=[[0,0],[0,1],[1,0],[2,1],[3,2]];drawLabArrows();resetLabMarks()});
+  document.getElementById('loadMissingBtn').addEventListener('click',()=>{labEdges=[[0,0],[1,1],[2,2]];drawLabArrows();resetLabMarks()});
+
+  // Step 3: quiz
+  const quizItems=[
+    {title:'מספר 1',d:['א','ב','ג'],c:['a','b','c','d'],e:[[0,0],[0,1],[1,1],[2,2]],answer:'relation',reason:'לא פונקציה: מן המקור '+mi('א')+' יוצאים שני חצים. זו התאמה, אבל לא פונקציה.'},
+    {title:'מספר 2',d:['1','2','3','4','5'],c:['1','2','3'],e:[[0,0],[1,1],[3,2]],answer:'none',reason:'לא התאמה: לא לכל איבר בתחום יש תמונה. ל־'+mi('3')+' ול־'+mi('5')+' אין חץ.'},
+    {title:'מספר 3',d:['△','□','○'],c:['a','b','c','d'],e:[[0,1],[1,0],[2,3]],answer:'function',reason:'פונקציה: מכל איבר בתחום יוצא בדיוק חץ אחד.'},
+    {title:'מספר 4',d:['1','2','3','4','5'],c:['a'],e:[[0,0],[1,0],[2,0],[3,0],[4,0]],answer:'function',reason:'פונקציה קבועה: מותר לכמה מקורות שונים להגיע לאותה תמונה.'},
+    {title:'מספר 5',d:['○','●'],c:['□','◇'],e:[[0,0],[0,1],[1,1]],answer:'relation',reason:'לא פונקציה: מן המקור העליון יוצאים שני חצים.'},
+    {title:'מספר 6',d:['x','y','z','w'],c:['a','b'],e:[[1,0],[2,1],[3,1]],answer:'none',reason:'לא התאמה: ל־'+mi('x')+' אין תמונה.'},
+    {title:'מספר 7',d:['A','B','C'],c:['1','2','3','4'],e:[[0,3],[1,1],[2,0]],answer:'function',reason:'פונקציה: לכל מקור יש תמונה אחת ויחידה.'},
+    {title:'מספר 8',d:['−2','0','5'],c:['1','4','7'],e:[[0,0],[1,1],[2,2]],answer:'function',reason:'גם כשמשתמשים במספרים, הכלל נשאר זהה: לכל מקור תמונה אחת.'},
+    {title:'מספר 9',d:['a','b','c','d'],c:['1','2'],e:[[0,0],[1,0],[2,1]],answer:'none',reason:'לא התאמה: ל־'+mi('d')+' אין תמונה.'},
+    {title:'מספר 10',d:['1','2','3'],c:['x','y','z'],e:[[0,1],[1,1],[2,1]],answer:'function',reason:'פונקציה: כל איבר בתחום שולח חץ אחד בלבד, גם אם כולם מגיעים אל '+mi('y')+'.'},
+    {title:'מספר 11',d:['p','q'],c:['7','8','9'],e:[[0,2],[1,0]],answer:'function',reason:'פונקציה: לשני המקורות יש תמונה אחת ויחידה.'},
+    {title:'מספר 12',d:['m','n','k'],c:['2','4'],e:[[0,0],[1,1],[1,0],[2,1]],answer:'relation',reason:'לא פונקציה: מן המקור '+mi('n')+' יוצאים שני חצים.'},
+    {title:'מספר 13',d:['אלון','ארז','שרון','רותם'],c:['כחול','אדום','צהוב','ירוק'],e:[[0,1],[1,1],[2,2],[3,3]],answer:'function',reason:'פונקציה: לכל שם מותאם צבע אחד בדיוק.'},
+    {title:'מספר 14',d:['0','1','2'],c:['0','1','4'],e:[[0,0],[1,1]],answer:'none',reason:'לא התאמה: ל־'+mi('2')+' אין תמונה.'},
+    {title:'מספר 15',d:['A1','A2','B1','B2'],c:['🥜','🥤','🍫','🍬'],e:[[0,0],[1,0],[2,1],[3,2]],answer:'function',reason:'זו דוגמת המכונה התקינה: לכל כפתור יש תוצאה אחת.'},
+    {title:'מספר 16',d:['A1','A2','B1','B2'],c:['🥜','🥤','🍫','🍬'],e:[[0,0],[0,1],[1,0],[2,1],[3,2]],answer:'relation',reason:'זו מכונה לא תקינה: מן הכפתור '+mi('A1')+' יוצאות שתי תוצאות.'},
+    {title:'מספר 17',d:['1','4','9'],c:['1','2','3','4'],e:[[0,0],[1,1],[2,2]],answer:'function',reason:'פונקציה: לכל מספר בתחום יש תמונה אחת.'},
+    {title:'מספר 18',d:['−3','−1','2'],c:['1','4','9'],e:[[0,2],[1,0],[2,1]],answer:'function',reason:'עוד דוגמה מספרית תקינה – לכל מקור חץ יחיד.'}
+  ];
+  let quizIndex=0; let quizAnswered=false;
+  function renderQuiz(){
+    const q=quizItems[quizIndex]; quizAnswered=false;
+    document.getElementById('quizTitle').textContent=`${q.title} · האם הדיאגרמה מתארת פונקציה?`;
+    document.getElementById('quizDomain').innerHTML=q.d.map((x,i)=>`<div class="node" data-q-d="${i}">${x}</div>`).join('');
+    document.getElementById('quizCodomain').innerHTML=q.c.map((x,i)=>`<div class="node" data-q-c="${i}">${x}</div>`).join('');
+    document.querySelectorAll('.answer-btn').forEach(b=>b.classList.remove('correct','wrong'));
+    document.getElementById('quizReason').textContent='בחרו תשובה ואז נסביר למה.';
+    setTimeout(drawQuizArrows,30);
+  }
+  function drawQuizArrows(){
+    const q=quizItems[quizIndex], container=document.getElementById('quizDiagram'); if(!container.offsetParent)return; const svg=document.getElementById('quizArrowLayer');svg.innerHTML='';
+    q.e.forEach(([d,c])=>{const dn=document.querySelector(`[data-q-d="${d}"]`),cn=document.querySelector(`[data-q-c="${c}"]`);const p1=nodeCenter(dn,container),p2=nodeCenter(cn,container);svgArrow(svg,p1.x+34,p1.y,p2.x-34,p2.y,'#2356a8',4)});
+  }
+  document.querySelectorAll('.answer-btn').forEach(btn=>btn.addEventListener('click',()=>{
+    if(quizAnswered)return;quizAnswered=true; const q=quizItems[quizIndex];
+    btn.classList.add(btn.dataset.answer===q.answer?'correct':'wrong');
+    const correct=document.querySelector(`.answer-btn[data-answer="${q.answer}"]`); correct.classList.add('correct');
+    document.getElementById('quizReason').innerHTML=q.reason;
+  }));
+  document.getElementById('nextQuizBtn').addEventListener('click',()=>{quizIndex=(quizIndex+1)%quizItems.length;renderQuiz()});
+
+  // Step 4: real world
+  const worldItems=[
+    {icon:'🪖',text:'לכל חייל מתאימים את המספר האישי שלו.',answer:'yes',reason:'פונקציה: לכל חייל יש מספר אישי אחד ויחיד.'},
+    {icon:'🎂',text:'לכל יום בשנה מתאימים את האנשים שנולדו באותו יום.',answer:'no',reason:'לא פונקציה: ליום אחד יכולים להתאים אנשים רבים.'},
+    {icon:'👦',text:'לכל ילד מתאימים את האמא שלו.',answer:'yes',reason:'פונקציה: לכל ילד מותאמת אמא אחת.'},
+    {icon:'👁️',text:'לכל אדם מתאימים את צבע העיניים שלו.',answer:'yes',reason:'פונקציה: לכל אדם יש צבע עיניים אחד בזמן נתון.'},
+    {icon:'🌡️',text:'לכל שעה ביממה מתאימים את הטמפרטורה שנמדדה במקום מסוים.',answer:'yes',reason:'פונקציה: לכל שעה מותאמת מדידה אחת.'},
+    {icon:'🔤',text:'לכל מילה מתאימים את מספר האותיות שלה.',answer:'yes',reason:'פונקציה: לכל מילה יש מספר אותיות אחד.'},
+    {icon:'🔡',text:'לכל מילה מתאימים את האותיות שמופיעות בה.',answer:'no',reason:'לא פונקציה: למילה אחת מותאמות בדרך כלל כמה אותיות.'},
+    {icon:'🔢',text:'לכל מספר דו־ספרתי מתאימים את סכום ספרותיו.',answer:'yes',reason:'פונקציה: לכל מספר כזה יש סכום ספרות יחיד.'},
+    {icon:'👨‍👧',text:'לכל אדם מתאימים את הילדים שלו.',answer:'no',reason:'לא פונקציה: יש אנשים עם כמה ילדים, ויש אנשים ללא ילדים.'},
+    {icon:'🟦',text:'לכל צבע מתאימים את האנשים שזהו צבע העיניים שלהם.',answer:'no',reason:'לא פונקציה: לצבע אחד יכולים להתאים אנשים רבים, ולפעמים אף אחד.'},
+    {icon:'➕',text:'לכל מספר מתאימים את המספר הגדול ממנו ב־3.',answer:'yes',reason:'פונקציה: לכל מספר יש תוצאה אחת – המספר '+mi('+3')+' ממנו.'},
+    {icon:'✖️',text:'לכל מספר מתאימים את ריבועו.',answer:'yes',reason:'פונקציה: לכל מספר יש ריבוע אחד.'},
+    {icon:'↔️',text:'לכל מספר מתאימים את המספר הנגדי לו.',answer:'yes',reason:'פונקציה: לכל מספר יש מספר נגדי יחיד.'},
+    {icon:'➗',text:'לכל מספר מתאימים את ההופכי שלו.',answer:'no',reason:'לא פונקציה על כל המספרים: ל־'+mi('0')+' אין הופכי.'},
+    {icon:'√',text:'לכל מספר חיובי מתאימים את שני השורשים הריבועיים שלו.',answer:'no',reason:'לא פונקציה: לכל מספר חיובי מותאמות שתי תוצאות.'},
+    {icon:'🏫',text:'לכל תלמיד בכיתה מתאימים את מספר תעודת הזהות שלו.',answer:'yes',reason:'פונקציה: לכל תלמיד מספר אחד ויחיד.'},
+    {icon:'📅',text:'לכל חודש מתאימים את כמות הגשמים שירדה בו במקום מסוים.',answer:'yes',reason:'פונקציה: לכל חודש יש כמות מדידה אחת.'},
+    {icon:'🔺',text:'לכל משולש מתאימים את שטחו.',answer:'yes',reason:'פונקציה: לכל משולש שטח אחד.'},
+    {icon:'🧮',text:'לכל מספר דו־ספרתי מתאימים את שתי ספרותיו.',answer:'no',reason:'לא פונקציה: למספר אחד מותאמות שתי ספרות.'},
+    {icon:'🎓',text:'לכל מקצוע בבית הספר מתאימים את התלמידים שאוהבים אותו.',answer:'no',reason:'לא פונקציה: למקצוע אחד יכולים להתאים תלמידים רבים או אף תלמיד.'}
+  ];
+  let worldIndex=0,worldAnswered=false;
+  function renderWorld(){const w=worldItems[worldIndex];worldAnswered=false;document.getElementById('worldIcon').textContent=w.icon;document.getElementById('worldText').textContent=w.text;document.getElementById('worldReason').textContent='קודם החליטו יחד.';document.querySelectorAll('[data-world]').forEach(b=>{b.style.opacity='1';b.style.outline='none'})}
+  document.querySelectorAll('[data-world]').forEach(btn=>btn.addEventListener('click',()=>{if(worldAnswered)return;worldAnswered=true;const w=worldItems[worldIndex];const ok=btn.dataset.world===w.answer;btn.style.outline=ok?'5px solid rgba(24,121,78,.2)':'5px solid rgba(180,35,24,.2)';document.getElementById('worldReason').innerHTML=w.reason}));
+  document.getElementById('nextWorldBtn').addEventListener('click',()=>{worldIndex=(worldIndex+1)%worldItems.length;renderWorld()});
+
+  // Step 5: source and image
+  const sourceD=['a','b','c']; const sourceC=['1','2','3','4']; const sourceE=[[0,0],[1,2],[2,2]];
+  function renderSource(){
+    document.getElementById('sourceDomain').innerHTML=sourceD.map((x,i)=>`<button class="node selectable" data-s-d="${i}">${x}</button>`).join('');
+    document.getElementById('sourceCodomain').innerHTML=sourceC.map((x,i)=>`<button class="node selectable" data-s-c="${i}">${x}</button>`).join('');
+    document.querySelectorAll('[data-s-d]').forEach(n=>n.addEventListener('click',()=>highlightSource(+n.dataset.sD)));
+    document.querySelectorAll('[data-s-c]').forEach(n=>n.addEventListener('click',()=>highlightCodomain(+n.dataset.sC)));
+    setTimeout(drawSourceArrows,30);
+  }
+  function drawSourceArrows(){const container=document.getElementById('sourceDiagram');if(!container.offsetParent)return;const svg=document.getElementById('sourceArrowLayer');svg.innerHTML='';sourceE.forEach(([d,c])=>{const dn=document.querySelector(`[data-s-d="${d}"]`),cn=document.querySelector(`[data-s-c="${c}"]`);const p1=nodeCenter(dn,container),p2=nodeCenter(cn,container);svgArrow(svg,p1.x+34,p1.y,p2.x-34,p2.y,'#7a1f3d',4)})}
+  function clearSourceMarks(){document.querySelectorAll('#sourceDiagram .node').forEach(n=>n.classList.remove('selected','good','problem'))}
+  function highlightSource(i){clearSourceMarks();const e=sourceE.find(x=>x[0]===i);document.querySelector(`[data-s-d="${i}"]`).classList.add('selected');document.querySelector(`[data-s-c="${e[1]}"]`).classList.add('good');document.getElementById('sourceExplain').innerHTML=`${mi(sourceD[i])}&nbsp;הוא מקור.<br>${mi(sourceC[e[1]])}&nbsp;היא התמונה שלו.`}
+  function highlightCodomain(i){clearSourceMarks();const sources=sourceE.filter(x=>x[1]===i).map(x=>x[0]);document.querySelector(`[data-s-c="${i}"]`).classList.add('selected');sources.forEach(s=>document.querySelector(`[data-s-d="${s}"]`).classList.add('good'));document.getElementById('sourceExplain').innerHTML=sources.length?`המקור${sources.length>1?'ות':''} של&nbsp;${mi(sourceC[i])}:&nbsp;${mi(sources.map(s=>sourceD[s]).join(', '))}`:`ל־${mi(sourceC[i])}&nbsp;אין מקור בדיאגרמה הזו.`}
+  document.getElementById('showImagesSetBtn').addEventListener('click',()=>{clearSourceMarks();const imgs=[...new Set(sourceE.map(e=>e[1]))];imgs.forEach(i=>document.querySelector(`[data-s-c="${i}"]`).classList.add('good'));document.getElementById('sourceExplain').innerHTML=`קבוצת התמונות היא:&nbsp;${mi('{ '+imgs.map(i=>sourceC[i]).join(', ')+' }')}`});
+  document.getElementById('resetSourceBtn').addEventListener('click',()=>{clearSourceMarks();document.getElementById('sourceExplain').textContent='לחצו על איבר בתחום או בטווח.'});
+
+  // Step 6: f(x)
+  function fxCalc(){
+    const x=Number(document.getElementById('fxInput').value||0), rule=document.getElementById('fxRule').value; let y,formula,steps;
+    if(rule==='plus3'){y=x+3;formula='f(x)=x+3';steps=[`${x}`,`${x}+3`,`${y}`]}
+    if(rule==='times2'){y=2*x;formula='f(x)=2x';steps=[`${x}`,`2·${x}`,`${y}`]}
+    if(rule==='square'){y=x*x;formula='f(x)=x²';steps=[`${x}`,`${x}²`,`${y}`]}
+    if(rule==='neg'){y=-x;formula='f(x)=−x';steps=[`${x}`,`−(${x})`,`${y}`]}
+    document.getElementById('fxFormula').textContent=formula;document.getElementById('fxOutput').textContent=y;document.getElementById('fxSentence').innerHTML=`לכן: ${mi(`f(${x}) = ${y}`)}`;document.getElementById('fxSteps').innerHTML=steps.map((s,i)=>`${i?'<span style="font-size:28px">→</span>':''}<span class="calc-step">${s}</span>`).join('');
+  }
+  document.getElementById('fxInput').addEventListener('input',fxCalc);document.getElementById('fxRule').addEventListener('change',fxCalc);
+
+  // Redraw arrows on resize
+  window.addEventListener('resize',()=>{drawLabArrows();drawQuizArrows();drawSourceArrows()});
+
+  buildNav(); renderLabNodes(); renderQuiz(); renderWorld(); renderSource(); fxCalc();
+</script>
+</body>
+</html>
